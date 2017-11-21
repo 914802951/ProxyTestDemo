@@ -1,6 +1,7 @@
 package com.lz.proxytestdemo.sdlapp;
 
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -10,6 +11,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import com.lz.proxytestdemo.R;
+import com.lz.proxytestdemo.activity.SingleMainActivity;
 import com.lz.proxytestdemo.util.LogHelper;
 
 import java.util.ArrayList;
@@ -70,12 +72,15 @@ public class SingleSdlService extends Service {
 
     private void enterForeground() {
         Bitmap icon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+        Intent intent = new Intent(this, SingleMainActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
         Notification.Builder builder = new Notification.Builder(this);
         builder.setContentTitle(getPackageName());
         builder.setContentText(getPackageName());
-
+        builder.setContentIntent(pendingIntent);
         builder.setLargeIcon(icon);
+        builder.setSmallIcon(R.mipmap.ic_launcher);
         builder.setOngoing(true);
 
         Notification notification;
