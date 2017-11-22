@@ -186,7 +186,7 @@ public class SdlApp{
                 }
             }
             if(mTransportConfig == null){
-                mTransportConfig = new MultiplexTransportConfig(mContext, mAppId.toString());
+                mTransportConfig = new MultiplexTransportConfig(mContext, mAppId.toString(), MultiplexTransportConfig.FLAG_MULTI_SECURITY_OFF);
             }
 
             Counter++;

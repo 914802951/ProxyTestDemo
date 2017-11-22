@@ -16,7 +16,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activity.SingleMainActivity"
+        <activity android:name=".activity.MultiMainActivity"
             android:launchMode="singleTask"
             android:configChanges="orientation|keyboardHidden|screenSize">
             <intent-filter>
@@ -26,8 +26,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".activity.MultiMainActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"/>
+        <!--<activity android:name=".activity.MultiMainActivity"-->
+            <!--android:configChanges="orientation|keyboardHidden|screenSize"/>-->
 
         <activity android:name=".activity.LogSdlAppActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"/>
@@ -41,20 +41,20 @@
             android:process="com.smartdevicelink.router">
         </service>
 
-        <!--<receiver-->
-            <!--android:name=".sdlapp.SdlReceiver"-->
-            <!--android:exported="true"-->
-            <!--android:enabled="true">-->
+        <receiver
+            android:name=".sdlapp.SdlReceiver"
+            android:exported="true"
+            android:enabled="true">
 
-            <!--<intent-filter>-->
-                <!--<action android:name="android.bluetooth.device.action.ACL_CONNECTED" />-->
-                <!--<action android:name="android.bluetooth.device.action.ACL_DISCONNECTED"/>-->
-                <!--<action android:name="android.bluetooth.adapter.action.STATE_CHANGED"/>-->
-                <!--<action android:name="android.media.AUDIO_BECOMING_NOISY" />-->
-                <!--<action android:name="sdl.router.startservice" />-->
-            <!--</intent-filter>-->
+            <intent-filter>
+                <action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
+                <action android:name="android.bluetooth.device.action.ACL_DISCONNECTED"/>
+                <action android:name="android.bluetooth.adapter.action.STATE_CHANGED"/>
+                <action android:name="android.media.AUDIO_BECOMING_NOISY" />
+                <action android:name="sdl.router.startservice" />
+            </intent-filter>
 
-        <!--</receiver>-->
+        </receiver>
 
     </application>
 

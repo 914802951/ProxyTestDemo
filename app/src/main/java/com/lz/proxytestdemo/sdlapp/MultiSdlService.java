@@ -1,6 +1,7 @@
 package com.lz.proxytestdemo.sdlapp;
 
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -51,7 +52,24 @@ public class MultiSdlService extends Service {
             mApp.resetApp();
         }
 
-        enterForeground();
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(true) {
+                    try {
+                        Thread.sleep(60 * 1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    if(mApp != null){
+                        mApp.resetApp();
+                    }
+                }
+            }
+        }).start();
+
+//        enterForeground();
         //use START_STICKY because we want the SDLService to be explicitly started and stopped as needed.
         return START_STICKY;
     }
@@ -59,21 +77,24 @@ public class MultiSdlService extends Service {
     @Override
     public void onDestroy() {
         LogHelper.v(TAG, LogHelper._FUNC_());
-        super.onDestroy();
         if (mApp != null){
             mApp.releaseApp();
             mApp = null;
         }
+        super.onDestroy();
     }
 
     private void enterForeground() {
         Bitmap icon = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+        Intent intent = new Intent(this, MultiSdlService.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
 
         Notification.Builder builder = new Notification.Builder(this);
         builder.setContentTitle(getPackageName());
         builder.setContentText(getPackageName());
-
+        builder.setContentIntent(pendingIntent);
         builder.setLargeIcon(icon);
+        builder.setSmallIcon(R.mipmap.ic_launcher);
         builder.setOngoing(true);
 
         Notification notification;
