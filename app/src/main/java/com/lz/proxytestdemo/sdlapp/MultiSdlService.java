@@ -59,11 +59,11 @@ public class MultiSdlService extends Service {
     @Override
     public void onDestroy() {
         LogHelper.v(TAG, LogHelper._FUNC_());
-        super.onDestroy();
         if (mApp != null){
             mApp.releaseApp();
             mApp = null;
         }
+        super.onDestroy();
     }
 
     private void enterForeground() {

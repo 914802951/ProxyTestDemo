@@ -60,10 +60,10 @@ public class SingleSdlService extends Service {
     @Override
     public void onDestroy() {
         LogHelper.v(TAG, LogHelper._FUNC_());
-        super.onDestroy();
         for (SdlApp app : SdlAppList){
             app.releaseApp();
         }
+        super.onDestroy();
     }
 
     public static List<SdlApp> getSdlAppList(){
