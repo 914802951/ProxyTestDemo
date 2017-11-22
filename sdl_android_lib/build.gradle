@@ -1,0 +1,2 @@
+configurations.maybeCreate("default")
+artifacts.add("default", file('sdl_android-release.aar'))
