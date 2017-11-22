@@ -38,7 +38,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="4"
-            android:inputType="textNoSuggestions|number"/>
+            android:inputType="number"/>
     </LinearLayout>
 
     <LinearLayout
@@ -102,7 +102,8 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="4"
                 android:text="127.0.0.1"
-                android:inputType="textNoSuggestions|numberDecimal"/>
+                android:inputType="textNoSuggestions"
+                android:digits="0123456789."/>
         </LinearLayout>
 
         <LinearLayout
@@ -121,7 +122,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="4"
                 android:text="12345"
-                android:inputType="textNoSuggestions|number"/>
+                android:inputType="number"/>
         </LinearLayout>
 
     </LinearLayout>
