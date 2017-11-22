@@ -1,9 +1,11 @@
 package com.lz.proxytestdemo.activity;
 
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AlertDialog;
@@ -11,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.RadioButton;
@@ -22,6 +25,8 @@ import com.lz.proxytestdemo.adapter.AppListAdapter;
 import com.lz.proxytestdemo.sdlapp.LogSdlApp;
 import com.lz.proxytestdemo.sdlapp.SdlApp;
 import com.lz.proxytestdemo.sdlapp.SingleSdlService;
+import com.lz.proxytestdemo.util.Check;
+import com.lz.proxytestdemo.util.Const;
 import com.lz.proxytestdemo.util.LogHelper;
 import com.smartdevicelink.transport.BTTransportConfig;
 import com.smartdevicelink.transport.BaseTransportConfig;
@@ -131,6 +136,10 @@ public class SingleMainActivity extends AppCompatActivity {
 
     private void showNewSdlAppDialog() {
 
+        final SharedPreferences sp = getSharedPreferences(getPackageName(), Context.MODE_PRIVATE);
+        int sp_port = sp.getInt(Const.SP_TCP_PORT, Const.DEFAULT_TCP_PORT);
+        String sp_ip = sp.getString(Const.SP_TCP_IP, Const.DEFAULT_TCP_IP);
+
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(SingleMainActivity.this);
 
         final View dialogView = LayoutInflater.from(SingleMainActivity.this)
@@ -145,6 +154,8 @@ public class SingleMainActivity extends AppCompatActivity {
         RadioGroup typeRg = (RadioGroup) dialogView.findViewById(R.id.transport_type_rg);
         appNameEt.setText(SdlApp.APP_NAME + Counter);
         appIdEt.setText(String.valueOf(SdlApp.APP_ID + Counter));
+        tcpIpEt.setText(sp_ip);
+        tcpPortEt.setText(String.valueOf(sp_port));
         typeRg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
@@ -158,10 +169,20 @@ public class SingleMainActivity extends AppCompatActivity {
 
         dialogBuilder.setTitle("New Sdl App");
         dialogBuilder.setView(dialogView);
-        dialogBuilder.setPositiveButton("Ok",
-                new DialogInterface.OnClickListener() {
+        dialogBuilder.setPositiveButton("Ok",null);
+        dialogBuilder.setNegativeButton("Cancel", null);
+
+        AlertDialog alertDialog = dialogBuilder.create();
+        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+
+            @Override
+            public void onShow(final DialogInterface dialog) {
+
+                Button button = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
+                button.setOnClickListener(new View.OnClickListener() {
+
                     @Override
-                    public void onClick(DialogInterface dialog, int which) {
+                    public void onClick(View view) {
                         startSingleService();
                         try {
                             SdlApp.Builder builder = new SdlApp.Builder(SingleMainActivity.this);
@@ -174,9 +195,17 @@ public class SingleMainActivity extends AppCompatActivity {
                             } else if (usbRb.isChecked()) {
                                 config = new USBTransportConfig(SingleMainActivity.this);
                             } else if (tcpRb.isChecked()) {
-                                config = new TCPTransportConfig(
-                                        Integer.valueOf(tcpPortEt.getText().toString()),
-                                        tcpIpEt.getText().toString(), true);
+                                int port = Integer.valueOf(tcpPortEt.getText().toString());
+                                String ip =  tcpIpEt.getText().toString();
+                                if(!Check.legalIP(ip)) {
+                                    Toast.makeText(SingleMainActivity.this, "illegal ip", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+                                config = new TCPTransportConfig(port, ip, true);
+                                SharedPreferences.Editor edit = sp.edit();
+                                edit.putInt(Const.SP_TCP_PORT, port);
+                                edit.putString(Const.SP_TCP_IP, ip);
+                                edit.commit();
                             } else {
                                 config = new MultiplexTransportConfig(SingleMainActivity.this, builder.mAppId.toString());
                             }
@@ -188,17 +217,18 @@ public class SingleMainActivity extends AppCompatActivity {
                             mAppListAdapter.add(sdlApp);
                             mAppListAdapter.notifyDataSetChanged();
                         }catch (Exception e){
-                            Toast.makeText(SingleMainActivity.this, "Parameters error", Toast.LENGTH_LONG).show();
+                            Toast.makeText(SingleMainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
                         }
+
+                        //Dismiss once everything is OK.
+                        dialog.dismiss();
                     }
                 });
-        dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
             }
         });
-        dialogBuilder.show();
+
+        alertDialog.show();
+
     }
 
     private ServiceConnection mSdlServiceConnection = new ServiceConnection() {
