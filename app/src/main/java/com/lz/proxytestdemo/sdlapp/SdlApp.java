@@ -228,6 +228,10 @@ public class SdlApp{
         return mTransportConfig;
     }
 
+    public Context getAppContext(){
+        return mContext;
+    }
+
     @CallSuper
     public void releaseApp(){
         LogHelper.v(TAG, LogHelper._FUNC_());
@@ -280,25 +284,35 @@ public class SdlApp{
 
     @CallSuper
     protected void initProxy() {
-        LogHelper.v(TAG, LogHelper._FUNC_());
-        if (mSdlProxy == null) {
-            try {
-                //Create a new mSdlProxy using Bluetooth transport
-                //The listener, app name,
-                //whether or not it is a media app and the applicationId are supplied.
+        if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
+            new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    initProxy();
+                    return null;
+                }
+            }.execute();
+        } else {
+            LogHelper.v(TAG, LogHelper._FUNC_());
+            if (mSdlProxy == null) {
+                try {
+                    //Create a new mSdlProxy using Bluetooth transport
+                    //The listener, app name,
+                    //whether or not it is a media app and the applicationId are supplied.
 //                mSdlProxy = new SdlProxyALM(mContext, mProxyListener, mAppName, true, mAppId.toString());
-                Vector<TTSChunk> chunks = new Vector<TTSChunk>();
-                TTSChunk ttsChunks = TTSChunkFactory.createChunk(SpeechCapabilities.TEXT, mAppName);
-                chunks.add(ttsChunks);
-                SdlMsgVersion SdlMsgVersion = new SdlMsgVersion();
-                SdlMsgVersion.setMajorVersion(2);
-                SdlMsgVersion.setMinorVersion(2);Vector<AppHMIType> vrAppHMITypes = new Vector<AppHMIType>();
-                vrAppHMITypes.add(mAppHMIType);
-                mSdlProxy = new SdlProxyALM(mProxyListener,
+                    Vector<TTSChunk> chunks = new Vector<TTSChunk>();
+                    TTSChunk ttsChunks = TTSChunkFactory.createChunk(SpeechCapabilities.TEXT, mAppName);
+                    chunks.add(ttsChunks);
+                    SdlMsgVersion SdlMsgVersion = new SdlMsgVersion();
+                    SdlMsgVersion.setMajorVersion(2);
+                    SdlMsgVersion.setMinorVersion(2);
+                    Vector<AppHMIType> vrAppHMITypes = new Vector<AppHMIType>();
+                    vrAppHMITypes.add(mAppHMIType);
+                    mSdlProxy = new SdlProxyALM(mProxyListener,
 						/*Sdl proxy configuration resources*/null,
 						/*enable advanced lifecycle management true,*/
-                        mAppName,
-                        chunks,
+                            mAppName,
+                            chunks,
 						/*ngn media app*/null,
 						/*vr synonyms*/null,
 						/*is media app*/mIsMediaApp,
@@ -311,17 +325,18 @@ public class SdlApp{
 						/*callbackToUIThre1ad*/ false,
 						/*preRegister*/ false,
 						/*app resuming*/ null,
-                        mTransportConfig);
-            } catch (SdlException e) {
-                //There was an error creating the mSdlProxy
-                if (mSdlProxy == null) {
-                    //Stop the MultiSdlService
-                    releaseApp();
+                            mTransportConfig);
+                } catch (SdlException e) {
+                    //There was an error creating the mSdlProxy
+                    if (mSdlProxy == null) {
+                        //Stop the MultiSdlService
+                        releaseApp();
+                    }
                 }
+            } else if (mForceConnect) {
+                mSdlProxy.forceOnConnected();
+                resetStatus();
             }
-        }else if(mForceConnect){
-            mSdlProxy.forceOnConnected();
-            resetStatus();
         }
     }
 
@@ -407,6 +422,11 @@ public class SdlApp{
     }
 
     public class SdlAppProxyListener extends MyProxyListenerALM{
+
+        public void onFirstRun(OnHMIStatus notification){
+            show("Base Sdl App", "Show", "MediaTrack");
+        }
+
         @CallSuper
         @Override
         public void onOnHMIStatus(OnHMIStatus notification) {
@@ -439,25 +459,25 @@ public class SdlApp{
                     return;
             }
 
-//            switch (notification.getHmiLevel()) {
-//                case HMI_FULL:
-//                    if (notification.getFirstRun()) {
-//                        try {
-//                            show("Sync Proxy", "Show", "MediaTrack");
-//                        } catch (Exception e) {
-//                            e.printStackTrace();
-//                        }
-//                    }
-//                    break;
-//                case HMI_LIMITED:
-//                    break;
-//                case HMI_BACKGROUND:
-//                    break;
-//                case HMI_NONE:
-//                    break;
-//                default:
-//                    return;
-//            }
+            switch (notification.getHmiLevel()) {
+                case HMI_FULL:
+                    if (notification.getFirstRun()) {
+                        try {
+                            onFirstRun(notification);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    break;
+                case HMI_LIMITED:
+                    break;
+                case HMI_BACKGROUND:
+                    break;
+                case HMI_NONE:
+                    break;
+                default:
+                    return;
+            }
         }
 
         @CallSuper

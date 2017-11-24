@@ -72,7 +72,7 @@ public class LogListAdapter extends BaseAdapter{
         }
         if(item.getObjects() != null){
             for (Object o : item.getObjects()){
-                sb.append(o).append("\n");
+                sb.append(o).append(" ");
             }
         }
         holder.mLogHeadTv.setText(sb.substring(0, sb.length() - 1));

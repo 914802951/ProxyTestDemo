@@ -1,6 +1,7 @@
 package com.lz.proxytestdemo.sdlapp;
 
 import android.content.Context;
+import android.support.annotation.CallSuper;
 
 import com.lz.proxytestdemo.util.LogHelper;
 import com.smartdevicelink.proxy.RPCMessage;
@@ -190,373 +191,428 @@ public class LogSdlApp extends SdlApp {
     public class LogSdlAppProxyListener extends SdlAppProxyListener{
 
         @Override
+        public void onFirstRun(OnHMIStatus notification) {
+            show("Log Sdl App", "Show", "MediaTrack");
+        }
+
+        @CallSuper
+        @Override
         public void onOnHMIStatus(OnHMIStatus notification) {
             addLogData(new LogDataBean(notification));
             super.onOnHMIStatus(notification);
-
-            switch (notification.getHmiLevel()) {
-                case HMI_FULL:
-                    if (notification.getFirstRun()) {
-                        try {
-                            show("Log Sdl App", "Show", "MediaTrack");
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    break;
-                case HMI_LIMITED:
-                    break;
-                case HMI_BACKGROUND:
-                    break;
-                case HMI_NONE:
-                    break;
-                default:
-                    return;
-            }
         }
 
+        @CallSuper
         @Override
         public void onProxyClosed(String info, Exception e, SdlDisconnectedReason reason) {
             super.onProxyClosed(info, e, reason);
             addLogData(new LogDataBean(e, info, reason));
         }
 
+        @CallSuper
         @Override
         public void onError(String info, Exception e) {
             super.onError(info, e);
             addLogData(new LogDataBean(e, info));
         }
 
+        @CallSuper
         @Override
         public void onServiceEnded(OnServiceEnded serviceEnded) {
             addLogData(new LogDataBean(serviceEnded));
         }
 
+        @CallSuper
         @Override
         public void onServiceNACKed(OnServiceNACKed serviceNACKed) {
             addLogData(new LogDataBean(serviceNACKed));
         }
 
+        @CallSuper
         @Override
         public void onOnStreamRPC(OnStreamRPC notification) {
             addLogData(new LogDataBean(notification));
         }
 
+        @CallSuper
         @Override
         public void onStreamRPCResponse(StreamRPCResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onGenericResponse(GenericResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onOnCommand(OnCommand notification) {
             addLogData(new LogDataBean(notification));
         }
 
+        @CallSuper
         @Override
         public void onAddCommandResponse(AddCommandResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onAddSubMenuResponse(AddSubMenuResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onCreateInteractionChoiceSetResponse(CreateInteractionChoiceSetResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onAlertResponse(AlertResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onDeleteCommandResponse(DeleteCommandResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onDeleteInteractionChoiceSetResponse(DeleteInteractionChoiceSetResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onDeleteSubMenuResponse(DeleteSubMenuResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onPerformInteractionResponse(PerformInteractionResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onResetGlobalPropertiesResponse(ResetGlobalPropertiesResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onSetGlobalPropertiesResponse(SetGlobalPropertiesResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onSetMediaClockTimerResponse(SetMediaClockTimerResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onShowResponse(ShowResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onSpeakResponse(SpeakResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onOnButtonEvent(OnButtonEvent notification) {
             addLogData(new LogDataBean(notification));
         }
 
+        @CallSuper
         @Override
         public void onOnButtonPress(OnButtonPress notification) {
             addLogData(new LogDataBean(notification));
         }
 
+        @CallSuper
         @Override
         public void onSubscribeButtonResponse(SubscribeButtonResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onUnsubscribeButtonResponse(UnsubscribeButtonResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onOnPermissionsChange(OnPermissionsChange notification) {
             addLogData(new LogDataBean(notification));
         }
 
+        @CallSuper
         @Override
         public void onSubscribeVehicleDataResponse(SubscribeVehicleDataResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onUnsubscribeVehicleDataResponse(UnsubscribeVehicleDataResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onGetVehicleDataResponse(GetVehicleDataResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onOnVehicleData(OnVehicleData notification) {
             addLogData(new LogDataBean(notification));
         }
 
+        @CallSuper
         @Override
         public void onPerformAudioPassThruResponse(PerformAudioPassThruResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onEndAudioPassThruResponse(EndAudioPassThruResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onOnAudioPassThru(OnAudioPassThru notification) {
             addLogData(new LogDataBean(notification));
         }
 
+        @CallSuper
         @Override
         public void onPutFileResponse(PutFileResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onDeleteFileResponse(DeleteFileResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onListFilesResponse(ListFilesResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onSetAppIconResponse(SetAppIconResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onScrollableMessageResponse(ScrollableMessageResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onChangeRegistrationResponse(ChangeRegistrationResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onSetDisplayLayoutResponse(SetDisplayLayoutResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onOnLanguageChange(OnLanguageChange notification) {
             addLogData(new LogDataBean(notification));
         }
 
+        @CallSuper
         @Override
         public void onOnHashChange(OnHashChange notification) {
             addLogData(new LogDataBean(notification));
         }
 
+        @CallSuper
         @Override
         public void onSliderResponse(SliderResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onOnDriverDistraction(OnDriverDistraction notification) {
             addLogData(new LogDataBean(notification));
         }
 
+        @CallSuper
         @Override
         public void onOnTBTClientState(OnTBTClientState notification) {
             addLogData(new LogDataBean(notification));
         }
 
+        @CallSuper
         @Override
         public void onOnSystemRequest(OnSystemRequest notification) {
             addLogData(new LogDataBean(notification));
         }
 
+        @CallSuper
         @Override
         public void onSystemRequestResponse(SystemRequestResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onOnKeyboardInput(OnKeyboardInput notification) {
             addLogData(new LogDataBean(notification));
         }
 
+        @CallSuper
         @Override
         public void onOnTouchEvent(OnTouchEvent notification) {
             addLogData(new LogDataBean(notification));
         }
 
+        @CallSuper
         @Override
         public void onDiagnosticMessageResponse(DiagnosticMessageResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onReadDIDResponse(ReadDIDResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onGetDTCsResponse(GetDTCsResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onOnLockScreenNotification(OnLockScreenStatus notification) {
             addLogData(new LogDataBean(notification));
         }
 
+        @CallSuper
         @Override
         public void onDialNumberResponse(DialNumberResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onSendLocationResponse(SendLocationResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onShowConstantTbtResponse(ShowConstantTbtResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onAlertManeuverResponse(AlertManeuverResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onUpdateTurnListResponse(UpdateTurnListResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onServiceDataACK(int dataSize) {
 //            addLogData(new LogDataBean(dataSize));
         }
 
+        @CallSuper
         @Override
         public void onGetWayPointsResponse(GetWayPointsResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onSubscribeWayPointsResponse(SubscribeWayPointsResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onUnsubscribeWayPointsResponse(UnsubscribeWayPointsResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onOnWayPointChange(OnWayPointChange notification) {
             addLogData(new LogDataBean(notification));
         }
 
+        @CallSuper
         @Override
         public void onGetSystemCapabilityResponse(GetSystemCapabilityResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onGetInteriorVehicleDataResponse(GetInteriorVehicleDataResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onButtonPressResponse(ButtonPressResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onSetInteriorVehicleDataResponse(SetInteriorVehicleDataResponse response) {
             addLogData(new LogDataBean(response));
         }
 
+        @CallSuper
         @Override
         public void onOnInteriorVehicleData(OnInteriorVehicleData notification) {
             addLogData(new LogDataBean(notification));
         }
 
+        @CallSuper
         @Override
         public void onSendHapticDataResponse(SendHapticDataResponse response) {
             addLogData(new LogDataBean(response));

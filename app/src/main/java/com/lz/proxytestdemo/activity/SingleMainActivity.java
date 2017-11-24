@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.lz.proxytestdemo.R;
 import com.lz.proxytestdemo.adapter.AppListAdapter;
 import com.lz.proxytestdemo.sdlapp.LogSdlApp;
+import com.lz.proxytestdemo.sdlapp.MediaSdlApp;
 import com.lz.proxytestdemo.sdlapp.SdlApp;
 import com.lz.proxytestdemo.sdlapp.SingleSdlService;
 import com.lz.proxytestdemo.util.Check;
@@ -211,13 +212,14 @@ public class SingleMainActivity extends AppCompatActivity {
                             }
 
                             builder.mTransportConfig = config;
-                            LogSdlApp sdlApp = builder.build(LogSdlApp.class, LogSdlApp.LogSdlAppProxyListener.class);
+                            MediaSdlApp sdlApp = builder.build(MediaSdlApp.class, MediaSdlApp.MediaSdlAppProxyListener.class);
                             Counter++;
                             sdlApp.addOnDataChangedListener(mSdlAppListener);
                             mAppListAdapter.add(sdlApp);
                             mAppListAdapter.notifyDataSetChanged();
                         }catch (Exception e){
-                            Toast.makeText(SingleMainActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                            Toast.makeText(SingleMainActivity.this, "Error: " + e.toString(), Toast.LENGTH_LONG).show();
+                            e.printStackTrace();
                         }
 
                         //Dismiss once everything is OK.

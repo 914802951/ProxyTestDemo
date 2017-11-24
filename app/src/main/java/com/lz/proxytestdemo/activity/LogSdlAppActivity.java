@@ -1,9 +1,16 @@
 package com.lz.proxytestdemo.activity;
 
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.lz.proxytestdemo.R;
@@ -12,6 +19,7 @@ import com.lz.proxytestdemo.sdlapp.LogSdlApp;
 import com.lz.proxytestdemo.sdlapp.SdlApp;
 import com.lz.proxytestdemo.sdlapp.SingleSdlService;
 import com.lz.proxytestdemo.util.LogHelper;
+import com.smartdevicelink.proxy.RPCMessage;
 
 /**
  * Created by Administrator on 2017/11/20.
@@ -96,5 +104,50 @@ public class LogSdlAppActivity extends AppCompatActivity {
             @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {}
         });
+        mLogListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                showSdlAppLogDialog(position);
+            }
+        });
+    }
+
+    private void showSdlAppLogDialog(int position) {
+
+        LogSdlApp.LogDataBean item = mLogListAdapter.getItem(position);
+        StringBuilder sb = new StringBuilder();
+        if(item.getThrowable() != null){
+            sb.append(item.getThrowable().getMessage());
+            sb.append("\n");
+            sb.append(Log.getStackTraceString(item.getThrowable()));
+            sb.append("\n\n");
+        }
+        if(item.getRpcMessage() != null){
+            RPCMessage msg = item.getRpcMessage();
+            String head = msg.getFunctionName() + "(" +
+                    msg.getMessageType() + ")";
+            sb.append(head);
+            sb.append("\n");
+            sb.append(mSdlApp.serializeJSON(item.getRpcMessage()));
+            sb.append("\n\n");
+        }
+        if(item.getObjects() != null){
+            for (Object o : item.getObjects()){
+                sb.append(o).append("\n");
+            }
+        }
+
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(LogSdlAppActivity.this);
+
+        final View dialogView = LayoutInflater.from(LogSdlAppActivity.this)
+                .inflate(R.layout.dialog_app_log,null);
+        final TextView appLogTv = (TextView) dialogView.findViewById(R.id.app_log_tv);
+        appLogTv.setText(sb.toString().trim());
+        appLogTv.setMovementMethod(ScrollingMovementMethod.getInstance());
+
+        dialogBuilder.setView(dialogView);
+        dialogBuilder.setPositiveButton("Ok", null);
+        dialogBuilder.show();
+
     }
 }
