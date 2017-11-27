@@ -319,6 +319,7 @@ public class MediaSdlApp extends LogSdlApp {
         private Object mTimerLock = new Object();
         private Object mStatusLock = new Object();
         private Object mSongLock = new Object();
+        private Object mLoadLock = new Object();
         private boolean mCanceled = false;
         private int mCounter = 0;
         private int[] mCurrentSong = {0, 0};
@@ -336,20 +337,27 @@ public class MediaSdlApp extends LogSdlApp {
                         new Song("Song 9", 100),
                         new Song("Song 10", 350))),
                 new SongList("List 3", Arrays.asList(
-                        new Song("Song 11", 200),
-                        new Song("Song 12", 300),
-                        new Song("Song 13", 150),
-                        new Song("Song 14", 100),
-                        new Song("Song 15", 350)))
+                        new Song("Song 11", 20),
+                        new Song("Song 12", 30),
+                        new Song("Song 13", 15),
+                        new Song("Song 14", 10),
+                        new Song("Song 15", 35)))
         );
 
         public void setMediaPlayerStatus(MediaPlayerStatus status){
             LogHelper.v(TAG, LogHelper._FUNC_(), status.name());
             synchronized (mStatusLock) {
+                MediaPlayerStatus previousStatus = mMediaPlayerStatus;
                 mMediaPlayerStatus = status;
                 mStatusChanged = true;
                 synchronized (mTimerLock) {
                     mTimerLock.notifyAll();
+                }
+
+                if(previousStatus == MediaPlayerStatus.Loading && mMediaPlayerStatus == MediaPlayerStatus.Loading){
+                    synchronized (mLoadLock){
+                        mLoadLock.notifyAll();
+                    }
                 }
             }
         }
@@ -459,17 +467,22 @@ public class MediaSdlApp extends LogSdlApp {
                                 new Integer[]{0, 0, 0},
                                 UpdateMode.COUNTDOWN);
                         LogHelper.v(TAG, "loading wait: " + sleepTime * 1000);
-                        synchronized (mTimerLock) {
+                        synchronized (mLoadLock) {
                             try {
-                                mTimerLock.wait(sleepTime * 1000);
+                                mLoadLock.wait(sleepTime * 1000);
                             } catch (InterruptedException e) {
                                 continue;
                             }
                         }
-                        if(mStatusChanged){
-                            continue;
+                        if(mMediaPlayerStatus == MediaPlayerStatus.Pausing){
+                            setHmiMediaStatus(title,
+                                    mMediaPlayerStatus.name(),
+                                    new Integer[]{0, 0, 0},
+                                    durationHMS, UpdateMode.COUNTUP);
+                            setMediaPlayerStatus(MediaPlayerStatus.Pausing);
+                        }else {
+                            setMediaPlayerStatus(MediaPlayerStatus.Playing);
                         }
-                        setMediaPlayerStatus(MediaPlayerStatus.Playing);
                     }else {
                         setHmiMediaStatus("Media Sdl App", mMediaPlayerStatus.name(), null, null, UpdateMode.CLEAR);
                     }
