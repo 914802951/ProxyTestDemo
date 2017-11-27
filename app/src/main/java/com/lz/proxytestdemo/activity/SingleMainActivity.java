@@ -32,6 +32,7 @@ import com.lz.proxytestdemo.sdlapp.MediaSdlApp;
 import com.lz.proxytestdemo.sdlapp.SdlApp;
 import com.lz.proxytestdemo.sdlapp.SingleSdlService;
 import com.lz.proxytestdemo.sdlapp.navigation.NavigationSdlApp;
+import com.lz.proxytestdemo.sdlapp.projection.ProjectionSdlApp;
 import com.lz.proxytestdemo.util.Check;
 import com.lz.proxytestdemo.util.Const;
 import com.lz.proxytestdemo.util.LogHelper;
@@ -168,7 +169,7 @@ public class SingleMainActivity extends AppCompatActivity {
         appIdEt.setText(String.valueOf(SdlApp.APP_ID + Counter));
         ArrayAdapter<AppHMIType> adapter =
                 new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
-                        Arrays.asList(AppHMIType.MEDIA, AppHMIType.NAVIGATION));
+                        Arrays.asList(AppHMIType.MEDIA, AppHMIType.NAVIGATION, AppHMIType.PROJECTION));
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         appTypeSpinner.setAdapter(adapter);
         tcpIpEt.setText(sp_ip);
@@ -233,7 +234,9 @@ public class SingleMainActivity extends AppCompatActivity {
                                 sdlApp = builder.build(MediaSdlApp.class, MediaSdlApp.MediaSdlAppProxyListener.class);
                             }else if(appTypeSpinner.getSelectedItem().equals(AppHMIType.NAVIGATION)){
                                 sdlApp = builder.build(NavigationSdlApp.class, NavigationSdlApp.NavigationSdlAppProxyListener.class);
-                            }else{
+                            }else if(appTypeSpinner.getSelectedItem().equals(AppHMIType.PROJECTION)){
+                                sdlApp = builder.build(ProjectionSdlApp.class, ProjectionSdlApp.ProjectionSdlAppProxyListener.class);
+                            } else{
                                 throw new RuntimeException(appTypeSpinner.getSelectedItem() + " is not supported!");
                             }
                             Counter++;
