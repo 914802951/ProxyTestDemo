@@ -455,6 +455,8 @@ public class SdlApp{
                     break;
                 case NOT_AUDIBLE:
                     break;
+                case ATTENUATED:
+                    break;
                 default:
                     return;
             }

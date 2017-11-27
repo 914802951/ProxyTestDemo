@@ -196,13 +196,16 @@ public class MediaSdlApp extends LogSdlApp {
                     if(mMediaPlayer.getMediaPlayerStatus() == MediaPlayerStatus.Pausing) {
                         mMediaPlayer.setMediaPlayerStatus(MediaPlayerStatus.Resume);
                     }else if(mMediaPlayer.getMediaPlayerStatus() == MediaPlayerStatus.Playing){
-                        mMediaPlayer.setMediaPlayerStatus(MediaPlayerStatus.Resume);
+//                        mMediaPlayer.setMediaPlayerStatus(MediaPlayerStatus.Resume);
                     }else if(mMediaPlayer.getMediaPlayerStatus() == MediaPlayerStatus.None){
                         mMediaPlayer.setMediaPlayerStatus(MediaPlayerStatus.Playing);
                     }
                     break;
+                case ATTENUATED:
                 case NOT_AUDIBLE:
-                    mMediaPlayer.setMediaPlayerStatus(MediaPlayerStatus.Pausing);
+                    if(mMediaPlayer.getMediaPlayerStatus() != MediaPlayerStatus.Pausing) {
+                        mMediaPlayer.setMediaPlayerStatus(MediaPlayerStatus.Pausing);
+                    }
                     break;
                 default:
                     return;
