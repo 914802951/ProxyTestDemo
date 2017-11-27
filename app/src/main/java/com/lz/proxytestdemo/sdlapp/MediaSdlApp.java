@@ -490,7 +490,8 @@ public class MediaSdlApp extends LogSdlApp {
                     synchronized (mTimerLock){
                         try {
                             mTimerLock.wait(1000);
-                            if(mMediaPlayerStatus == MediaPlayerStatus.Playing){
+                            if(mMediaPlayerStatus == MediaPlayerStatus.Playing ||
+                                    mMediaPlayerStatus == MediaPlayerStatus.Resume){
                                 mCounter++;
                             }
                         } catch (InterruptedException e) {
