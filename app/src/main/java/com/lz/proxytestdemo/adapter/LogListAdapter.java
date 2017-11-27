@@ -1,6 +1,7 @@
 package com.lz.proxytestdemo.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,8 @@ import android.widget.TextView;
 import com.lz.proxytestdemo.R;
 import com.lz.proxytestdemo.sdlapp.LogSdlApp;
 import com.smartdevicelink.proxy.RPCMessage;
+import com.smartdevicelink.proxy.RPCResponse;
+import com.smartdevicelink.proxy.constants.Names;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -76,13 +79,22 @@ public class LogListAdapter extends BaseAdapter{
             }
         }
         holder.mLogHeadTv.setText(sb.substring(0, sb.length() - 1));
-//        holder.mLogBodyTv.setText(item.mBodyMsg);
         holder.mLogTimeTv.setText(formatter.format(item.getDate()));
-//        if(item.mCollapse || item.mBodyMsg == null){
-//            holder.mLogBodyTv.setVisibility(View.GONE);
-//        }else {
-//            holder.mLogBodyTv.setVisibility(View.VISIBLE);
-//        }
+
+        if(item.getRpcMessage() != null){
+            String type = item.getRpcMessage().getMessageType();
+            if (type.equals(Names.request)) {
+                holder.mLogHeadTv.setTextColor(Color.CYAN);
+            } else if (type.equals(Names.notification)) {
+                holder.mLogHeadTv.setTextColor(Color.argb(0xff, 0xff, 0xb0, 0x00));
+            } else if (type.equals(Names.response)) {
+                if(((RPCResponse)item.getRpcMessage()).getSuccess()) {
+                    holder.mLogHeadTv.setTextColor(Color.argb(0xff, 0x20, 0xa1, 0x20));
+                }else{
+                    holder.mLogHeadTv.setTextColor(Color.argb(0xff, 0xed, 0x1c, 0x24));
+                }
+            }
+        }
         return convertView;
     }
 
@@ -95,12 +107,6 @@ public class LogListAdapter extends BaseAdapter{
         mList.clear();
         notifyDataSetChanged();
     }
-
-//    public void OnItemSelected(int position){
-//        LogSdlApp.LogDataBean item = mList.get(position);
-//        item.mCollapse = !item.mCollapse;
-//        notifyDataSetChanged();
-//    }
 
     class ViewHolder {
         TextView mLogHeadTv;
