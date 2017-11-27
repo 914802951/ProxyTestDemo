@@ -1,23 +1,28 @@
 package com.lz.proxytestdemo.activity;
 
+import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.lz.proxytestdemo.R;
@@ -26,14 +31,18 @@ import com.lz.proxytestdemo.sdlapp.LogSdlApp;
 import com.lz.proxytestdemo.sdlapp.MediaSdlApp;
 import com.lz.proxytestdemo.sdlapp.SdlApp;
 import com.lz.proxytestdemo.sdlapp.SingleSdlService;
+import com.lz.proxytestdemo.sdlapp.navigation.NavigationSdlApp;
 import com.lz.proxytestdemo.util.Check;
 import com.lz.proxytestdemo.util.Const;
 import com.lz.proxytestdemo.util.LogHelper;
+import com.smartdevicelink.proxy.rpc.enums.AppHMIType;
 import com.smartdevicelink.transport.BTTransportConfig;
 import com.smartdevicelink.transport.BaseTransportConfig;
 import com.smartdevicelink.transport.MultiplexTransportConfig;
 import com.smartdevicelink.transport.TCPTransportConfig;
 import com.smartdevicelink.transport.USBTransportConfig;
+
+import java.util.Arrays;
 
 public class SingleMainActivity extends AppCompatActivity {
 
@@ -54,6 +63,7 @@ public class SingleMainActivity extends AppCompatActivity {
 
         initView();
         initListener();
+        getPermission();
     }
 
     private void initView(){
@@ -147,6 +157,7 @@ public class SingleMainActivity extends AppCompatActivity {
                 .inflate(R.layout.dialog_new_sdl_app,null);
         final EditText appNameEt = (EditText) dialogView.findViewById(R.id.app_name_et);
         final EditText appIdEt = (EditText) dialogView.findViewById(R.id.app_id_et);
+        final Spinner appTypeSpinner = (Spinner) dialogView.findViewById(R.id.app_type_spinner);
         final EditText tcpIpEt = (EditText) dialogView.findViewById(R.id.tcp_ip_et);
         final EditText tcpPortEt = (EditText) dialogView.findViewById(R.id.tcp_port_et);
         final RadioButton btRb = (RadioButton) dialogView.findViewById(R.id.transport_type_bt_rb);
@@ -155,6 +166,11 @@ public class SingleMainActivity extends AppCompatActivity {
         RadioGroup typeRg = (RadioGroup) dialogView.findViewById(R.id.transport_type_rg);
         appNameEt.setText(SdlApp.APP_NAME + Counter);
         appIdEt.setText(String.valueOf(SdlApp.APP_ID + Counter));
+        ArrayAdapter<AppHMIType> adapter =
+                new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
+                        Arrays.asList(AppHMIType.MEDIA, AppHMIType.NAVIGATION));
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        appTypeSpinner.setAdapter(adapter);
         tcpIpEt.setText(sp_ip);
         tcpPortEt.setText(String.valueOf(sp_port));
         typeRg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -212,7 +228,14 @@ public class SingleMainActivity extends AppCompatActivity {
                             }
 
                             builder.mTransportConfig = config;
-                            MediaSdlApp sdlApp = builder.build(MediaSdlApp.class, MediaSdlApp.MediaSdlAppProxyListener.class);
+                            LogSdlApp sdlApp;
+                            if(appTypeSpinner.getSelectedItem().equals(AppHMIType.MEDIA)){
+                                sdlApp = builder.build(MediaSdlApp.class, MediaSdlApp.MediaSdlAppProxyListener.class);
+                            }else if(appTypeSpinner.getSelectedItem().equals(AppHMIType.NAVIGATION)){
+                                sdlApp = builder.build(NavigationSdlApp.class, NavigationSdlApp.NavigationSdlAppProxyListener.class);
+                            }else{
+                                throw new RuntimeException(appTypeSpinner.getSelectedItem() + " is not supported!");
+                            }
                             Counter++;
                             sdlApp.addOnDataChangedListener(mSdlAppListener);
                             mAppListAdapter.add(sdlApp);
@@ -231,6 +254,44 @@ public class SingleMainActivity extends AppCompatActivity {
 
         alertDialog.show();
 
+    }
+
+    private static final int REQUEST_PERMISSIONS = 1;
+    @Override
+    public void onRequestPermissionsResult(int permsRequestCode, String[] permissions, int[] grantResults){
+        switch(permsRequestCode){
+            case REQUEST_PERMISSIONS:
+                //判断用户是否授权，如果没有授权则退出
+                for(int res: grantResults){
+                    if(res != PackageManager.PERMISSION_GRANTED) finish();
+                }
+                break;
+        }
+    }
+
+    /**
+     * 判断是否有权限，如果没有则向用户请求权限
+     */
+    private void getPermission(){
+        String[] PERMISSIONS_STORAGE = {
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.CAMERA
+        };
+        int permission = 0;
+
+        for (String per : PERMISSIONS_STORAGE){
+            permission |= ActivityCompat.checkSelfPermission(this, per);
+        }
+
+        //判断是否有权限，如果没有则向用户请求权限
+        if (permission != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(
+                    this,
+                    PERMISSIONS_STORAGE,
+                    REQUEST_PERMISSIONS
+            );
+        }
     }
 
     private ServiceConnection mSdlServiceConnection = new ServiceConnection() {

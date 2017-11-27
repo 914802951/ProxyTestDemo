@@ -95,6 +95,11 @@ public class LogListAdapter extends BaseAdapter{
                 }
             }
         }
+
+        if(item.getThrowable() != null){
+            holder.mLogHeadTv.setTextColor(Color.argb(0xff, 0xed, 0x1c, 0x24));
+        }
+
         return convertView;
     }
 

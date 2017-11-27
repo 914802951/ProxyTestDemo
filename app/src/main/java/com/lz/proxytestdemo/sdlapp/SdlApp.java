@@ -125,8 +125,8 @@ public class SdlApp{
     protected Integer mAppId;
     protected String mAppName;
     protected Integer mAppIconId;
-    protected boolean mIsMediaApp = true;
-    protected AppHMIType mAppHMIType = AppHMIType.MEDIA;
+    protected Boolean mIsMediaApp;
+    protected AppHMIType mAppHMIType;
     protected BaseTransportConfig mTransportConfig;
 
     protected boolean mIsRestartApp = true;
@@ -162,7 +162,9 @@ public class SdlApp{
             T app;
             try {
                 Constructor constructor = sdlAppClass.getDeclaredConstructor(Context.class);
+                constructor.setAccessible(true);
                 app = (T) constructor.newInstance(mContext);
+                constructor.setAccessible(false);
                 constructor = listenerClass.getConstructor(sdlAppClass);
                 mProxyListener = (SdlAppProxyListener) constructor.newInstance(app);
             } catch (Exception e) {
@@ -198,8 +200,12 @@ public class SdlApp{
             app.mProxyListener = mProxyListener;
             app.mAppIconId = mAppIconId;
             app.mTransportConfig = mTransportConfig;
-            app.mIsMediaApp = mIsMediaApp;
-            app.mAppHMIType = mAppHMIType;
+            if(app.mIsMediaApp == null) {
+                app.mIsMediaApp = mIsMediaApp;
+            }
+            if(app.mAppHMIType == null) {
+                app.mAppHMIType = mAppHMIType;
+            }
             app.initProxy();
 
             return app;
