@@ -108,53 +108,63 @@ public class MediaSdlApp extends LogSdlApp {
         sendRpcMsg(msg);
     }
 
-    private boolean checkMediaClockTimer(Integer[] startTime, Integer[] endTime, UpdateMode updateMode){
-        if((updateMode == UpdateMode.COUNTDOWN || updateMode == UpdateMode.COUNTUP)
-                && (startTime == null || startTime.length < 3)){
-            LogHelper.e(TAG, "startTime is needed");
-            return false;
+    private boolean checkMediaClockTimer(Integer startTime, Integer endTime, UpdateMode updateMode){
+        int max = 59 * 60 * 60;
+        if(updateMode == UpdateMode.COUNTDOWN || updateMode == UpdateMode.COUNTUP){
+            if(startTime == null){
+                LogHelper.e(TAG, "start time is needed");
+                return false;
+            }else if(startTime < 0 || startTime > max){
+                LogHelper.e(TAG, "start time out of range");
+                return false;
+            }
+
+            if(endTime != null && endTime >= 0 && endTime <= max){
+                if(((startTime < endTime) && updateMode ==UpdateMode.COUNTDOWN)
+                        || ((startTime > endTime) && updateMode ==UpdateMode.COUNTUP)){
+                    LogHelper.e(TAG, "invalid data");
+                    return false;
+                }
+            }
         }
 
-        if(endTime != null && endTime.length >= 3){
-            int s = startTime[0] * 60 * 60 + startTime[1] * 60 + startTime[2];
-            int e = endTime[0] * 60 * 60 + endTime[1] * 60 + endTime[2];
-
-            if(((s < e) && updateMode ==UpdateMode.COUNTDOWN)
-                    || ((s > e) && updateMode ==UpdateMode.COUNTUP)){
-                LogHelper.e(TAG, "invalid data");
+        if(updateMode == UpdateMode.PAUSE){
+            if(endTime != null && (endTime < 0 || endTime > max)){
+                LogHelper.e(TAG, "end time out of range");
                 return false;
             }
         }
+
         return true;
     }
 
-    private void SetHmiMediaClockTimer(Integer[] startTime, Integer[] endTime, UpdateMode updateMode){
+    private void setHmiMediaClockTimer(Integer startTime, Integer endTime, UpdateMode updateMode){
         if(!checkMediaClockTimer(startTime, endTime, updateMode)) return;
 
         SetMediaClockTimer msg = new SetMediaClockTimer();
         msg.setUpdateMode(updateMode);
 
-        if(startTime != null && startTime.length >= 3) {
+        if(startTime != null) {
             StartTime st = new StartTime();
-            st.setHours(startTime[0]);
-            st.setMinutes(startTime[1]);
-            st.setSeconds(startTime[2]);
+            st.setHours(startTime / 60 / 60);
+            st.setMinutes((startTime / 60) % 60);
+            st.setSeconds(startTime % 60);
             msg.setStartTime(st);
         }
 
-        if(endTime != null && endTime.length >= 3){
+        if(endTime != null){
             StartTime et = new StartTime();
-            et.setHours(endTime[0]);
-            et.setMinutes(endTime[1]);
-            et.setSeconds(endTime[2]);
+            et.setHours(endTime / 60 / 60);
+            et.setMinutes((endTime / 60) % 60);
+            et.setSeconds(endTime % 60);
             msg.setEndTime(et);
         }
         sendRpcMsg(msg);
     }
 
-    private void setHmiMediaStatus(String title, String msg, Integer[] startTime, Integer[] endTime, UpdateMode updateMode){
+    private void setHmiMediaStatus(String title, String msg, Integer startTime, Integer endTime, UpdateMode updateMode){
         show(title, msg, null);
-        SetHmiMediaClockTimer(startTime, endTime, updateMode);
+        setHmiMediaClockTimer(startTime, endTime, updateMode);
     }
 
     private void showToast(final Context context, final String msg, final int duration){
@@ -444,19 +454,11 @@ public class MediaSdlApp extends LogSdlApp {
                     Song song = getCurrentSong();
                     String title = song.mName;
                     int duration = song.mDuration;
-                    Integer[] durationHMS = new Integer[3];
-                    durationHMS[2] = duration % 60;
-                    durationHMS[1] = (duration / 60) % 60;
-                    durationHMS[0] = duration / 60 / 60;
-                    Integer[] currentHMS = new Integer[3];
-                    currentHMS[2] = mCounter % 60;
-                    currentHMS[1] = (mCounter / 60) % 60;
-                    currentHMS[0] = mCounter / 60 / 60;
                     if(mMediaPlayerStatus == MediaPlayerStatus.Playing){
                         setHmiMediaStatus(title,
                                 mMediaPlayerStatus.name(),
-                                new Integer[]{0, 0, 0},
-                                durationHMS, UpdateMode.COUNTUP);
+                                0,
+                                duration, UpdateMode.COUNTUP);
                     }else if(mMediaPlayerStatus == MediaPlayerStatus.Resume){
                         setHmiMediaStatus(title, mMediaPlayerStatus.name(), null, null, UpdateMode.RESUME);
                     } else if(mMediaPlayerStatus == MediaPlayerStatus.Pausing){
@@ -466,8 +468,8 @@ public class MediaSdlApp extends LogSdlApp {
 //                        setHmiMediaStatus(title, mMediaPlayerStatus.name(), null, null, UpdateMode.CLEAR);
                         int sleepTime = new Random().nextInt(10) + 1;
                         setHmiMediaStatus(title, mMediaPlayerStatus.name(),
-                                new Integer[]{0, 0, sleepTime - 1},
-                                new Integer[]{0, 0, 0},
+                                sleepTime - 1,
+                                0,
                                 UpdateMode.COUNTDOWN);
                         LogHelper.v(TAG, "loading wait: " + sleepTime * 1000);
                         synchronized (mLoadLock) {
@@ -480,8 +482,8 @@ public class MediaSdlApp extends LogSdlApp {
                         if(mMediaPlayerStatus == MediaPlayerStatus.Pausing){
                             setHmiMediaStatus(title,
                                     mMediaPlayerStatus.name(),
-                                    new Integer[]{0, 0, 0},
-                                    durationHMS, UpdateMode.COUNTUP);
+                                    0,
+                                    duration, UpdateMode.COUNTUP);
                             setMediaPlayerStatus(MediaPlayerStatus.Pausing);
                         }else {
                             setMediaPlayerStatus(MediaPlayerStatus.Playing);
