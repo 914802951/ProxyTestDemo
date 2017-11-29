@@ -81,6 +81,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -91,12 +92,13 @@ import java.util.Set;
 public class LogSdlApp extends SdlApp {
 
     private static final String TAG = LogHelper.makeLogTag(LogSdlApp.class.getSimpleName());
+    private static final int MAX_LOG_LIST_SIZE = 1000;
 
     public interface OnDataChangedListener{
         void onDataChanged(LogDataBean data);
     }
 
-    private List<LogDataBean> mLogList = Collections.synchronizedList(new ArrayList<LogDataBean>(2000));
+    private List<LogDataBean> mLogList = Collections.synchronizedList(new LinkedList<LogDataBean>());
     private Set<WeakReference<OnDataChangedListener>> mLogListenerSet;
 
     protected LogSdlApp(Context context) {
@@ -117,6 +119,9 @@ public class LogSdlApp extends SdlApp {
     }
 
     public void addLogData(LogDataBean data){
+        while (mLogList.size() >= MAX_LOG_LIST_SIZE){
+            mLogList.remove(0);
+        }
         mLogList.add(data);
 //        LogHelper.v(TAG, "addLogData()", "mLogListenerSet.size:" + mLogListenerSet.size() + "mLogListenerSet:" + mLogListenerSet);
         Iterator<WeakReference<OnDataChangedListener>> it = mLogListenerSet.iterator();
