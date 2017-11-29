@@ -6,6 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -48,6 +50,28 @@ public class LogSdlAppActivity extends AppCompatActivity {
         initView();
         initListener();
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.log_activity_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.clear_log:
+                clearLog();
+                return true;
+            default:
+                return true;
+        }
+    }
+
+    private void clearLog(){
+        mLogListAdapter.clear();
     }
 
     private void initData(){
