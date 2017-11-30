@@ -88,6 +88,7 @@ public class MediaSdlApp extends LogSdlApp {
 
 //        int[] sb_id = {SB_ID_BUTTON1, SB_ID_BUTTON2, SB_ID_BUTTON3, SB_ID_BUTTON4};
 //        String[] sb_text = {"Button 1", "Button 2", "Button 3", "Button 4"};
+        mSoftBtns.clear();
         List<MockMediaPlayer.SongList> sl = mMediaPlayer.getSongList();
         for (int i = 0; i < sl.size(); i++){
             SoftButton sb = new SoftButton();
