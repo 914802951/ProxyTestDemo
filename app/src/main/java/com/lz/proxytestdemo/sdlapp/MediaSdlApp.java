@@ -292,7 +292,7 @@ public class MediaSdlApp extends LogSdlApp {
         @Override
         public void onProxyClosed(String info, Exception e, SdlDisconnectedReason reason) {
             super.onProxyClosed(info, e, reason);
-            mMediaPlayer.cancel();
+            mMediaPlayer.stop();
         }
     }
 
@@ -304,7 +304,7 @@ public class MediaSdlApp extends LogSdlApp {
         None
     }
 
-    class MockMediaPlayer extends Thread{
+    class MockMediaPlayer implements Runnable{
 
         private class SongList{
             String mName;
@@ -327,6 +327,7 @@ public class MediaSdlApp extends LogSdlApp {
             }
         }
 
+        private Thread mThread;
         private MediaPlayerStatus mMediaPlayerStatus = MediaPlayerStatus.None;
         private boolean mStatusChanged = false;
         private Object mTimerLock = new Object();
@@ -379,8 +380,19 @@ public class MediaSdlApp extends LogSdlApp {
             return mMediaPlayerStatus;
         }
 
-        public void cancel(){
-            mCanceled = true;
+        public void start(){
+            if(mThread == null){
+                mThread = new Thread(this);
+                mThread.start();
+            }
+        }
+
+        public void stop(){
+            if(mThread != null){
+                mCanceled = true;
+                mThread.interrupt();
+                mThread = null;
+            }
         }
 
         public void seekLeft(){

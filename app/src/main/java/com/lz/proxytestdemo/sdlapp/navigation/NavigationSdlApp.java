@@ -51,12 +51,12 @@ public class NavigationSdlApp extends LogSdlApp {
         @Override
         public void onProxyClosed(String info, Exception e, SdlDisconnectedReason reason) {
             super.onProxyClosed(info, e, reason);
-            mNavigation.interrupt();
+            mNavigation.stop();
         }
 
     }
 
-    class MockNavigation extends Thread {
+    class MockNavigation implements Runnable {
         /**
          * Record video from the camera preview and encode it as an MP4 file.
          * Demonstrates the use of MediaCodec with Camera input. Does not record
@@ -83,6 +83,7 @@ public class NavigationSdlApp extends LogSdlApp {
         // encoder state
         private InputSurface mInputSurface;
 
+        private Thread mThread;
         // camera state
         private Camera mCamera;
         private int mFPS;
@@ -108,6 +109,20 @@ public class NavigationSdlApp extends LogSdlApp {
 
         MockNavigation(Context context, int fps, int width, int height, int bitrate, boolean isEncryptedVideo) {
             this(context, fps, width, height, bitrate, IFRAME_INTERVAL, isEncryptedVideo);
+        }
+
+        public void start(){
+            if(mThread == null){
+                mThread = new Thread(this);
+                mThread.start();
+            }
+        }
+
+        public void stop(){
+            if(mThread != null){
+                mThread.interrupt();
+                mThread = null;
+            }
         }
 
         @Override
