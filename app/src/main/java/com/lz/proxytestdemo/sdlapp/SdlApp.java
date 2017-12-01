@@ -151,7 +151,7 @@ public class SdlApp{
                 throw new NullPointerException();
             }
 
-            mContext = context;
+            mContext = context.getApplicationContext();
         }
 
         public SdlApp build(){
