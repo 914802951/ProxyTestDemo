@@ -116,6 +116,12 @@ public class SingleMainActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+        for (SdlApp app : SingleSdlService.getSdlAppList()){
+            if(app instanceof LogSdlApp){
+                ((LogSdlApp) app).addOnDataChangedListener(mSdlAppListener);
+            }
+        }
     }
 
     private void startSingleService(){

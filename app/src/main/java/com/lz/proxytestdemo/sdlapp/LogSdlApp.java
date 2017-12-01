@@ -79,11 +79,9 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by Administrator on 2017/11/20.
@@ -99,11 +97,10 @@ public class LogSdlApp extends SdlApp {
     }
 
     private List<LogDataBean> mLogList = Collections.synchronizedList(new LinkedList<LogDataBean>());
-    private Set<WeakReference<OnDataChangedListener>> mLogListenerSet;
+    private LinkedList<WeakReference<OnDataChangedListener>> mLogListenerSet = new LinkedList<>();
 
     protected LogSdlApp(Context context) {
         super(context);
-        mLogListenerSet = new HashSet<>();
     }
 
     @Override
@@ -123,24 +120,31 @@ public class LogSdlApp extends SdlApp {
             mLogList.remove(0);
         }
         mLogList.add(data);
-//        LogHelper.v(TAG, "addLogData()", "mLogListenerSet.size:" + mLogListenerSet.size() + "mLogListenerSet:" + mLogListenerSet);
-        Iterator<WeakReference<OnDataChangedListener>> it = mLogListenerSet.iterator();
 
-
-        while (it.hasNext()) {
-            WeakReference<OnDataChangedListener> l = it.next();
-//            LogHelper.v(TAG, "WeakReference<OnDataChangedListener> l:" + l);
-//            LogHelper.v(TAG, "WeakReference<OnDataChangedListener> l.get:" + l.get());
-            if(l.get() != null){
-                l.get().onDataChanged(data);
-            }else {
-                it.remove();
+        synchronized (mLogListenerSet) {
+            Iterator<WeakReference<OnDataChangedListener>> it = mLogListenerSet.iterator();
+            while (it.hasNext()) {
+                WeakReference<OnDataChangedListener> l = it.next();
+                if (l.get() != null) {
+                    l.get().onDataChanged(data);
+                } else {
+                    it.remove();
+                }
             }
         }
     }
 
     public void addOnDataChangedListener(OnDataChangedListener listener){
-        mLogListenerSet.add(new WeakReference<OnDataChangedListener>(listener));
+        synchronized (mLogListenerSet) {
+            Iterator<WeakReference<OnDataChangedListener>> it = mLogListenerSet.iterator();
+            while (it.hasNext()) {
+                OnDataChangedListener l = it.next().get();
+                if(l != null && equals(listener)){
+                    return;
+                }
+            }
+            mLogListenerSet.add(new WeakReference<>(listener));
+        }
     }
 
     public String serializeJSON(RPCMessage msg) {
@@ -224,13 +228,13 @@ public class LogSdlApp extends SdlApp {
         @CallSuper
         @Override
         public void onServiceEnded(OnServiceEnded serviceEnded) {
-            addLogData(new LogDataBean(serviceEnded));
+            addLogData(new LogDataBean(serviceEnded, serviceEnded.getFunctionName(), serviceEnded.getSessionType().getName()));
         }
 
         @CallSuper
         @Override
         public void onServiceNACKed(OnServiceNACKed serviceNACKed) {
-            addLogData(new LogDataBean(serviceNACKed));
+            addLogData(new LogDataBean(serviceNACKed, serviceNACKed.getFunctionName(), serviceNACKed.getSessionType().getName()));
         }
 
         @CallSuper
