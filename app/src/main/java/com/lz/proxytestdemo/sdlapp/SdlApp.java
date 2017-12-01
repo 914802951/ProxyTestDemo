@@ -240,7 +240,7 @@ public class SdlApp{
 
     @CallSuper
     public void releaseApp(){
-        LogHelper.v(TAG, LogHelper._FUNC_());
+        LogHelper.v(TAG, LogHelper._FUNC_() + " on thread: " + Thread.currentThread().getName());
         if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
             new AsyncTask<Void, Void, Void>() {
                 @Override
@@ -258,6 +258,7 @@ public class SdlApp{
 
     @CallSuper
     public void resetApp(){
+        LogHelper.v(TAG, LogHelper._FUNC_() + " on thread: " + Thread.currentThread().getName());
         if (Thread.currentThread() == Looper.getMainLooper().getThread()) {
             new AsyncTask<Void, Void, Void>() {
                 @Override
@@ -352,10 +353,11 @@ public class SdlApp{
         if (mSdlProxy != null) {
             try {
                 mSdlProxy.dispose();
-                mSdlProxy = null;
             } catch (SdlException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
+            }finally {
+                mSdlProxy = null;
             }
         }
     }
@@ -437,6 +439,7 @@ public class SdlApp{
         @Override
         public void onOnHMIStatus(OnHMIStatus notification) {
             LogHelper.v(TAG, LogHelper._FUNC_());
+            LogHelper.v(TAG, "OnHMIStatus first run: " + notification.getHmiLevel() + ", " + notification.getFirstRun());
 
             mStatus = Status.CONNECTED;
 
