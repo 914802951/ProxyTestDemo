@@ -117,7 +117,7 @@ public class SdlApp{
 
     protected Context mContext;
     protected SdlProxyALM mSdlProxy;
-    protected IProxyListenerALM mProxyListener;
+    protected SdlAppProxyListener mProxyListener;
     protected boolean mForceConnect = false;
 
     protected Status mStatus = Status.DISCONNECT;
@@ -137,7 +137,7 @@ public class SdlApp{
 
         private Context mContext;
 
-        public IProxyListenerALM mProxyListener;
+        public SdlAppProxyListener mProxyListener;
         public boolean mForceConnect = false;
         public Integer mAppId;
         public String mAppName;
@@ -358,6 +358,8 @@ public class SdlApp{
                 e.printStackTrace();
             }finally {
                 mSdlProxy = null;
+                //We will not receive any news when proxy disposed, so do it ourself
+                mProxyListener.onDisposeProxy();
             }
         }
     }
@@ -433,6 +435,10 @@ public class SdlApp{
 
         public void onFirstRun(OnHMIStatus notification){
             show("Base Sdl App", "Show", "MediaTrack");
+        }
+
+        public void onDisposeProxy(){
+
         }
 
         @CallSuper

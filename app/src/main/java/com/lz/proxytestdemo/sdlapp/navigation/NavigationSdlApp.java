@@ -49,6 +49,11 @@ public class NavigationSdlApp extends LogSdlApp {
         }
 
         @Override
+        public void onDisposeProxy(){
+            mNavigation.stop();
+        }
+
+        @Override
         public void onProxyClosed(String info, Exception e, SdlDisconnectedReason reason) {
             super.onProxyClosed(info, e, reason);
             mNavigation.stop();

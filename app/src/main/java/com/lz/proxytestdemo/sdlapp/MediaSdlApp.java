@@ -188,6 +188,11 @@ public class MediaSdlApp extends LogSdlApp {
         }
 
         @Override
+        public void onDisposeProxy(){
+            mMediaPlayer.stop();
+        }
+
+        @Override
         public void onOnHMIStatus(OnHMIStatus notification) {
             super.onOnHMIStatus(notification);
 

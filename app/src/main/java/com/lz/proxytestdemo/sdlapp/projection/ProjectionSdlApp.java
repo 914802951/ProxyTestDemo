@@ -59,6 +59,11 @@ public class ProjectionSdlApp extends LogSdlApp {
         }
 
         @Override
+        public void onDisposeProxy(){
+            mProjection.stop();
+        }
+
+        @Override
         public void onProxyClosed(String info, Exception e, SdlDisconnectedReason reason) {
             super.onProxyClosed(info, e, reason);
             mProjection.stop();
