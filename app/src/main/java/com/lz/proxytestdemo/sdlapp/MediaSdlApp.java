@@ -6,7 +6,9 @@ import android.os.Looper;
 import android.widget.Toast;
 
 import com.lz.proxytestdemo.util.LogHelper;
+import com.smartdevicelink.protocol.enums.SessionType;
 import com.smartdevicelink.proxy.RPCRequestFactory;
+import com.smartdevicelink.proxy.callbacks.OnServiceEnded;
 import com.smartdevicelink.proxy.rpc.AddCommand;
 import com.smartdevicelink.proxy.rpc.OnButtonEvent;
 import com.smartdevicelink.proxy.rpc.OnCommand;
@@ -22,6 +24,7 @@ import com.smartdevicelink.proxy.rpc.enums.SdlDisconnectedReason;
 import com.smartdevicelink.proxy.rpc.enums.SoftButtonType;
 import com.smartdevicelink.proxy.rpc.enums.SystemAction;
 import com.smartdevicelink.proxy.rpc.enums.UpdateMode;
+import com.smartdevicelink.transport.enums.TransportType;
 import com.smartdevicelink.util.CorrelationIdGenerator;
 
 import java.util.ArrayList;
@@ -299,6 +302,14 @@ public class MediaSdlApp extends LogSdlApp {
         public void onProxyClosed(String info, Exception e, SdlDisconnectedReason reason) {
             super.onProxyClosed(info, e, reason);
             mMediaPlayer.stop();
+        }
+
+        @Override
+        public void onServiceEnded(OnServiceEnded serviceEnded) {
+            super.onServiceEnded(serviceEnded);
+            if(serviceEnded.getSessionType().equals(SessionType.RPC)) {
+                mMediaPlayer.stop();
+            }
         }
     }
 

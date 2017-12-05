@@ -4,7 +4,9 @@ import android.content.Context;
 
 import com.lz.proxytestdemo.sdlapp.LogSdlApp;
 import com.lz.proxytestdemo.util.LogHelper;
+import com.smartdevicelink.protocol.enums.SessionType;
 import com.smartdevicelink.proxy.SdlProxyALM;
+import com.smartdevicelink.proxy.callbacks.OnServiceEnded;
 import com.smartdevicelink.proxy.rpc.ImageResolution;
 import com.smartdevicelink.proxy.rpc.OnHMIStatus;
 import com.smartdevicelink.proxy.rpc.enums.AppHMIType;
@@ -67,6 +69,15 @@ public class ProjectionSdlApp extends LogSdlApp {
         public void onProxyClosed(String info, Exception e, SdlDisconnectedReason reason) {
             super.onProxyClosed(info, e, reason);
             mProjection.stop();
+        }
+
+        @Override
+        public void onServiceEnded(OnServiceEnded serviceEnded) {
+            super.onServiceEnded(serviceEnded);
+            if(serviceEnded.getSessionType().equals(SessionType.NAV)
+                    || serviceEnded.getSessionType().equals(SessionType.RPC)) {
+                mProjection.stop();
+            }
         }
 
     }
