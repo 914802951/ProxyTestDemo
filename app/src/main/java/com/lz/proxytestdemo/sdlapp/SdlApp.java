@@ -11,6 +11,7 @@ import com.lz.proxytestdemo.BuildConfig;
 import com.lz.proxytestdemo.R;
 import com.lz.proxytestdemo.util.LogHelper;
 import com.smartdevicelink.exception.SdlException;
+import com.smartdevicelink.protocol.enums.SessionType;
 import com.smartdevicelink.proxy.RPCRequest;
 import com.smartdevicelink.proxy.RPCResponse;
 import com.smartdevicelink.proxy.SdlProxyALM;
@@ -524,6 +525,21 @@ public class SdlApp{
         public void onError(String info, Exception e) {
             LogHelper.v(TAG, LogHelper._FUNC_());
             LogHelper.e(TAG, e, info);
+        }
+
+        @CallSuper
+        @Override
+        public void onServiceEnded(OnServiceEnded serviceEnded) {
+            LogHelper.v(TAG, LogHelper._FUNC_());
+            if(serviceEnded.getSessionType().equals(SessionType.RPC)){
+                //core send end session on closed
+                if(getTransportConfig().getTransportType().equals(TransportType.BLUETOOTH)) {
+                    //relisten bt transport
+                    resetApp();
+                }else{
+                    releaseApp();
+                }
+            }
         }
     }
 }

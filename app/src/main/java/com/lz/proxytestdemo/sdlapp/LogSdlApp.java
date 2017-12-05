@@ -228,6 +228,7 @@ public class LogSdlApp extends SdlApp {
         @CallSuper
         @Override
         public void onServiceEnded(OnServiceEnded serviceEnded) {
+            super.onServiceEnded(serviceEnded);
             addLogData(new LogDataBean(serviceEnded, serviceEnded.getFunctionName(), serviceEnded.getSessionType().getName()));
         }
 
