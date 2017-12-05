@@ -505,7 +505,21 @@ public class SdlApp{
             if(!mIsRestartApp || mTransportConfig.getTransportType().equals(TransportType.MULTIPLEX)) {
                 releaseApp();
             }else{
-                resetApp();
+                if(reason.equals(SdlDisconnectedReason.BLUETOOTH_DISABLED)){
+                    LogHelper.w(TAG, "Proxy closed with bluetooth disabled, do not reset app");
+                    resetStatus();
+                    disposeProxy();
+                }else if(reason.equals(SdlDisconnectedReason.BLUETOOTH_ADAPTER_ERROR)) {
+                    LogHelper.w(TAG, "Proxy closed with bluetooth adapter error, do not reset app");
+                    resetStatus();
+                    disposeProxy();
+                }else if(reason.equals(SdlDisconnectedReason.GENERIC_ERROR)) {
+                    LogHelper.w(TAG, "Cycling the proxy failed.");
+                    resetApp();
+                } else {
+                    LogHelper.w(TAG, "Proxy closed reason: " + reason);
+                    resetApp();
+                }
             }
         }
 

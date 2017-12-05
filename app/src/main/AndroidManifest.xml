@@ -45,6 +45,12 @@
             android:process="com.smartdevicelink.router">
         </service>
 
+        <receiver android:name=".broadcast.StaticBroadcastReceiver" >
+            <intent-filter>
+                <action android:name="android.bluetooth.adapter.action.STATE_CHANGED"/>
+            </intent-filter>
+        </receiver>
+
         <!--<receiver-->
             <!--android:name=".sdlapp.SdlReceiver"-->
             <!--android:exported="true"-->
