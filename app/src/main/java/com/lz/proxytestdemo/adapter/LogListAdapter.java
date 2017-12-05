@@ -80,6 +80,7 @@ public class LogListAdapter extends BaseAdapter{
         }
         holder.mLogHeadTv.setText(sb.substring(0, sb.length() - 1));
         holder.mLogTimeTv.setText(formatter.format(item.getDate()));
+        holder.mLogHeadTv.setTextColor(holder.mLogTimeTv.getTextColors());
 
         if(item.getRpcMessage() != null){
             String type = item.getRpcMessage().getMessageType();
