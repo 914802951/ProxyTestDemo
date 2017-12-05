@@ -252,7 +252,6 @@ public class SdlApp{
         } else {
             mIsRestartApp = false;
             disposeProxy();
-            resetStatus();
         }
     }
 
@@ -268,7 +267,6 @@ public class SdlApp{
                 }
             }.execute();
         } else {
-            resetStatus();
             resetProxy();
         }
 
@@ -342,7 +340,6 @@ public class SdlApp{
                 }
             } else if (mForceConnect) {
                 mSdlProxy.forceOnConnected();
-                resetStatus();
             }
         }
     }
@@ -350,6 +347,7 @@ public class SdlApp{
     @CallSuper
     protected void disposeProxy() {
         LogHelper.v(TAG, LogHelper._FUNC_());
+        resetStatus();
         if (mSdlProxy != null) {
             try {
                 mSdlProxy.dispose();
@@ -507,11 +505,9 @@ public class SdlApp{
             }else{
                 if(reason.equals(SdlDisconnectedReason.BLUETOOTH_DISABLED)){
                     LogHelper.w(TAG, "Proxy closed with bluetooth disabled, do not reset app");
-                    resetStatus();
                     disposeProxy();
                 }else if(reason.equals(SdlDisconnectedReason.BLUETOOTH_ADAPTER_ERROR)) {
                     LogHelper.w(TAG, "Proxy closed with bluetooth adapter error, do not reset app");
-                    resetStatus();
                     disposeProxy();
                 }else if(reason.equals(SdlDisconnectedReason.GENERIC_ERROR)) {
                     LogHelper.w(TAG, "Cycling the proxy failed.");
