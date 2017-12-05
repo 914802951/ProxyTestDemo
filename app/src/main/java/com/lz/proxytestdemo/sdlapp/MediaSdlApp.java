@@ -387,6 +387,7 @@ public class MediaSdlApp extends LogSdlApp {
         }
 
         public void start(){
+            this.stop();
             if(mThread == null){
                 mThread = new Thread(this);
                 mThread.start();
