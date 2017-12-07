@@ -515,6 +515,7 @@ public class SdlApp{
                 } else {
                     LogHelper.w(TAG, "Proxy closed reason: " + reason);
                     //Proxy cycle itself
+                    resetStatus();
                 }
             }
         }
