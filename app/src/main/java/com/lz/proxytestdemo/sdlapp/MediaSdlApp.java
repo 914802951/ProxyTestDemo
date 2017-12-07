@@ -68,6 +68,7 @@ public class MediaSdlApp extends LogSdlApp {
 
     private Handler mHandler = new Handler(Looper.getMainLooper());
     private MockMediaPlayer mMediaPlayer = new MockMediaPlayer();
+    private boolean isPauseManually = false;
 
     protected MediaSdlApp(Context context) {
         super(context);
@@ -184,6 +185,7 @@ public class MediaSdlApp extends LogSdlApp {
 
         @Override
         public void onFirstRun(OnHMIStatus notification) {
+            isPauseManually = false;
             mMediaPlayer.start();
             firstShow();
             subscribeButton();
@@ -212,13 +214,15 @@ public class MediaSdlApp extends LogSdlApp {
 
             switch (notification.getAudioStreamingState()) {
                 case AUDIBLE:
-                    if(mMediaPlayer.getMediaPlayerStatus() == MediaPlayerStatus.Pausing) {
-                        mMediaPlayer.setMediaPlayerStatus(MediaPlayerStatus.Resume);
-                    }else if(mMediaPlayer.getMediaPlayerStatus() == MediaPlayerStatus.Playing
-                            || mMediaPlayer.getMediaPlayerStatus() == MediaPlayerStatus.Loading){
-                        //do nothing
-                    }else if(mMediaPlayer.getMediaPlayerStatus() == MediaPlayerStatus.None){
-                        mMediaPlayer.setMediaPlayerStatus(MediaPlayerStatus.Playing);
+                    if(!isPauseManually) {
+                        if (mMediaPlayer.getMediaPlayerStatus() == MediaPlayerStatus.Pausing) {
+                            mMediaPlayer.setMediaPlayerStatus(MediaPlayerStatus.Resume);
+                        } else if (mMediaPlayer.getMediaPlayerStatus() == MediaPlayerStatus.Playing
+                                || mMediaPlayer.getMediaPlayerStatus() == MediaPlayerStatus.Loading) {
+                            //do nothing
+                        } else if (mMediaPlayer.getMediaPlayerStatus() == MediaPlayerStatus.None) {
+                            mMediaPlayer.setMediaPlayerStatus(MediaPlayerStatus.Playing);
+                        }
                     }
                     break;
                 case ATTENUATED:
@@ -263,15 +267,19 @@ public class MediaSdlApp extends LogSdlApp {
                     if(bn == ButtonName.OK){
                         if(mMediaPlayer.getMediaPlayerStatus() == MediaPlayerStatus.Pausing) {
                             mMediaPlayer.setMediaPlayerStatus(MediaPlayerStatus.Resume);
+                            isPauseManually = false;
                         }else if(mMediaPlayer.getMediaPlayerStatus() == MediaPlayerStatus.None){
 //                            mMediaPlayer.setMediaPlayerStatus(MediaPlayerStatus.Pausing);
                         }else{
                             mMediaPlayer.setMediaPlayerStatus(MediaPlayerStatus.Pausing);
+                            isPauseManually = true;
                         }
                     }else if(bn == ButtonName.SEEKLEFT){
                         mMediaPlayer.seekLeft();
+                        isPauseManually = false;
                     }else if(bn == ButtonName.SEEKRIGHT){
                         mMediaPlayer.seekRight();
+                        isPauseManually = false;
                     }
                     showToast(getAppContext(),
                             getAppName() + " " + bn.name() + " clicked",
