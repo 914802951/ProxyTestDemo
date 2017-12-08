@@ -1,7 +1,10 @@
 package com.lz.proxytestdemo.sdlapp;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.CallSuper;
+import android.widget.Toast;
 
 import com.lz.proxytestdemo.util.LogHelper;
 import com.smartdevicelink.proxy.RPCMessage;
@@ -96,11 +99,22 @@ public class LogSdlApp extends SdlApp {
         void onDataChanged(LogDataBean data);
     }
 
+    protected Handler mHandler = new Handler(Looper.getMainLooper());
+
     private List<LogDataBean> mLogList = Collections.synchronizedList(new LinkedList<LogDataBean>());
     private LinkedList<WeakReference<OnDataChangedListener>> mLogListenerSet = new LinkedList<>();
 
     protected LogSdlApp(Context context) {
         super(context);
+    }
+
+    protected void showToast(final Context context, final String msg, final int duration){
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(context, msg, duration).show();
+            }
+        });
     }
 
     @Override

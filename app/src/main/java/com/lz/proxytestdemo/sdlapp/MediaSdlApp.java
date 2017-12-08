@@ -1,8 +1,6 @@
 package com.lz.proxytestdemo.sdlapp;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 import android.widget.Toast;
 
 import com.lz.proxytestdemo.util.LogHelper;
@@ -24,7 +22,6 @@ import com.smartdevicelink.proxy.rpc.enums.SdlDisconnectedReason;
 import com.smartdevicelink.proxy.rpc.enums.SoftButtonType;
 import com.smartdevicelink.proxy.rpc.enums.SystemAction;
 import com.smartdevicelink.proxy.rpc.enums.UpdateMode;
-import com.smartdevicelink.transport.enums.TransportType;
 import com.smartdevicelink.util.CorrelationIdGenerator;
 
 import java.util.ArrayList;
@@ -66,7 +63,6 @@ public class MediaSdlApp extends LogSdlApp {
                     new Vector<>(Arrays.asList("Command 4")), null, null),
     };
 
-    private Handler mHandler = new Handler(Looper.getMainLooper());
     private MockMediaPlayer mMediaPlayer = new MockMediaPlayer();
     private boolean isPauseManually = false;
 
@@ -170,15 +166,6 @@ public class MediaSdlApp extends LogSdlApp {
     private void setHmiMediaStatus(String title, String msg, Integer startTime, Integer endTime, UpdateMode updateMode){
         show(title, msg, null);
         setHmiMediaClockTimer(startTime, endTime, updateMode);
-    }
-
-    private void showToast(final Context context, final String msg, final int duration){
-        mHandler.post(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(context, msg, duration).show();
-            }
-        });
     }
 
     public class MediaSdlAppProxyListener extends LogSdlAppProxyListener{
