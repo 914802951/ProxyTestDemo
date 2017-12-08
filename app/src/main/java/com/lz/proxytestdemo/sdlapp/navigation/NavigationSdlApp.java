@@ -97,6 +97,12 @@ public class NavigationSdlApp extends LogSdlApp {
             }
         }
 
+        @Override
+        public void onOnTouchEvent(OnTouchEvent notification) {
+            super.onOnTouchEvent(notification);
+            mNavigation.onTouchEvent(notification);
+        }
+
     }
 
     class MockNavigation implements Runnable {
