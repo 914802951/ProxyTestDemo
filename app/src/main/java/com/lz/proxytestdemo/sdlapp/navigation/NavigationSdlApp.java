@@ -6,6 +6,7 @@ import android.hardware.Camera;
 import android.util.Log;
 import android.view.Surface;
 import android.view.TextureView;
+import android.widget.Toast;
 
 import com.lz.proxytestdemo.sdlapp.LogSdlApp;
 import com.lz.proxytestdemo.util.LogHelper;
@@ -53,6 +54,32 @@ public class NavigationSdlApp extends LogSdlApp {
         @Override
         public void onDisposeProxy(){
             mNavigation.stop();
+        }
+
+        @Override
+        public void onOnHMIStatus(OnHMIStatus notification) {
+            super.onOnHMIStatus(notification);
+
+            switch (notification.getHmiLevel()) {
+                case HMI_FULL:
+                    mNavigation.start();
+                    mSdlProxy.resumeVideoStream();
+                    break;
+                case HMI_LIMITED:
+                    mSdlProxy.pauseVideoStream();
+                    break;
+                case HMI_BACKGROUND:
+                    mSdlProxy.pauseVideoStream();
+                    break;
+                case HMI_NONE:
+                    mNavigation.stop();
+                    break;
+                default:
+                    return;
+            }
+            showToast(getAppContext(),
+                    getAppName() + " " + notification.getHmiLevel().name(),
+                    Toast.LENGTH_SHORT);
         }
 
         @Override

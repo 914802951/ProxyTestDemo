@@ -1,6 +1,7 @@
 package com.lz.proxytestdemo.sdlapp.projection;
 
 import android.content.Context;
+import android.widget.Toast;
 
 import com.lz.proxytestdemo.sdlapp.LogSdlApp;
 import com.lz.proxytestdemo.util.LogHelper;
@@ -63,6 +64,32 @@ public class ProjectionSdlApp extends LogSdlApp {
         @Override
         public void onDisposeProxy(){
             mProjection.stop();
+        }
+
+        @Override
+        public void onOnHMIStatus(OnHMIStatus notification) {
+            super.onOnHMIStatus(notification);
+
+            switch (notification.getHmiLevel()) {
+                case HMI_FULL:
+                    mProjection.start();
+                    mSdlProxy.resumeVideoStream();
+                    break;
+                case HMI_LIMITED:
+                    mSdlProxy.pauseVideoStream();
+                    break;
+                case HMI_BACKGROUND:
+                    mSdlProxy.pauseVideoStream();
+                    break;
+                case HMI_NONE:
+                    mProjection.stop();
+                    break;
+                default:
+                    return;
+            }
+            showToast(getAppContext(),
+                    getAppName() + " " + notification.getHmiLevel().name(),
+                    Toast.LENGTH_SHORT);
         }
 
         @Override
