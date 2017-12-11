@@ -162,7 +162,10 @@ public class ProjectionSdlApp extends LogSdlApp {
                 return;
             }else {
                 SdlProxyALM proxy = mSdlProxy;
-                proxy.startRemoteDisplayStream(mContext, mRemoteDisplay, mParameters, mEncrypted);
+//                proxy.startRemoteDisplayStream(mContext, mRemoteDisplay, mParameters, mEncrypted);
+                //prevent proxy accidental NPE on getting system capability, maybe this work well
+                proxy.startRemoteDisplayStream(mContext, mRemoteDisplay, null, mEncrypted);
+
             }
         }
     }
