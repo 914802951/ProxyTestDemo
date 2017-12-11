@@ -35,7 +35,9 @@ public class ProjectionSdlApp extends LogSdlApp {
         super(context);
 
         mIsMediaApp = false;
-        mAppHMIType = AppHMIType.PROJECTION;
+//        mAppHMIType = AppHMIType.PROJECTION;
+        //AppHMIType.PROJECTION may be not supported
+        mAppHMIType = AppHMIType.NAVIGATION;
 
         VideoStreamingParameters desired = new VideoStreamingParameters();
         desired.setFrameRate(mFPS);
